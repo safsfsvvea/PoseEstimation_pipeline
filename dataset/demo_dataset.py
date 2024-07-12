@@ -11,7 +11,9 @@ class Dataset():
     def __init__(self, data_dir, cfg, 
             cam_K, cam_height, cam_width, n_triangles, object_renderer=None):
         self.model_dir = Path(data_dir) / 'models_eval'
+        print("self.model_dir: ", self.model_dir)
         self.cam_file = Path(data_dir) / 'camera.json'
+        print("self.cam_file: ", self.cam_file)
         self.cam_K = cam_K
         self.cam_K_np = cam_K.cpu().numpy()
         self.cam_height = cam_height
@@ -33,6 +35,7 @@ class Dataset():
         
         ### TODO: Combine faces and verts into same container.
         for model_file in sorted(self.model_dir.iterdir()):
+            print("model_file: ", model_file)
             if str(model_file).endswith('.ply'):
                 obj_id = int(model_file.name.split('_')[-1].split('.')[0])
                 self.obj_model_file[obj_id] = model_file
@@ -51,6 +54,7 @@ class Dataset():
             #self.vis = o3d.visualization.Visualizer()
             #self.vis.create_window(visible=True)
 
+        print("self.obj_model_file: ", self.obj_model_file)
     def render_cloud(self, obj_id, R, t, image):
         """
         Project the 3D points on to the image plane.
@@ -63,6 +67,7 @@ class Dataset():
                         [0, 0, -1]], dtype=np.float32))
         
         P = self.cam_K_np.dot(R.dot(self.point_cloud[obj_id].T) + t)
+        
         P = P // P[-1,:]
 
         ### TODO: Render just the points inside.
@@ -70,7 +75,13 @@ class Dataset():
             return image, False
 
         P = P.astype(int)
-        image[P[1], P[0], :] = 255
+        if np.any((P[1] < 0) | (P[1] >= image.shape[0]) | (P[0] < 0) | (P[0] >= image.shape[1])):
+            print(f"Error: P is out of bounds: P={P}, image.shape={image.shape}")
+            print(f"R: {R}, t: {t}, self.point_cloud[obj_id]: {self.point_cloud[obj_id]}")
+            print(f"self.cam_K_np: {self.cam_K_np}")
+        else:
+            image[P[1], P[0], :] = 255
+
         return image, True
 
     def render_mesh(self, obj_id, R, t, image, color=(0,0,255), alpha=0.5):
