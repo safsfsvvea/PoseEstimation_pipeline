@@ -68,7 +68,14 @@ class Dataset():
         
         P = self.cam_K_np.dot(R.dot(self.point_cloud[obj_id].T) + t)
         
-        P = P // P[-1,:]
+        P = P // P[-1,:] 
+        # 检查深度值是否有效
+        # if np.any(P[-1, :] <= 0):
+        #     print(f"Error: Invalid depth values in P: {P[-1, :]}")
+        #     return image, False
+
+        # P = P / P[-1, :]
+
 
         ### TODO: Render just the points inside.
         if P[1].max() >= self.cam_height or P[0].max() >= self.cam_width:
@@ -96,6 +103,13 @@ class Dataset():
         
         P = self.cam_K_np.dot(R.dot(self.point_cloud[obj_id].T) + t).squeeze()
         P = P // P[-1,:]
+        # 检查深度值是否有效
+        # if np.any(P[-1, :] <= 0):
+        #     print(f"Error: Invalid depth values in P: {P[-1, :]}")
+        #     return image, False
+
+        # P = P / P[-1, :]
+
 
         ### TODO: Render just the points inside.
         if P[1].max() >= self.cam_height or P[0].max() >= self.cam_width:
