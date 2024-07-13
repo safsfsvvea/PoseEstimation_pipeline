@@ -150,7 +150,10 @@ def main(args):
                         obj_depth=torch.tensor(
                             (depth_image*masks[0]*depth_scale).astype(np.float32)).squeeze()[None,...]
                         )
-
+            print("R: ", R)
+            print("R.shape: ", R.shape)
+            print("t: ", t)
+            print("t.shape: ", t.shape)
             ### TODO Multi object support.
             #obj_depths = torch.tensor([(depth_image*mask*depth_scale).astype(np.float32) for mask in masks])
             #R, t = pose_estimator.estimate_poses(obj_masks=masks_gpu, scores=scores,

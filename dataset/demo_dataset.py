@@ -78,12 +78,14 @@ class Dataset():
 
 
         ### TODO: Render just the points inside.
-        if P[1].max() >= self.cam_height or P[0].max() >= self.cam_width:
+        if P[1].max() >= self.cam_height or P[0].max() >= self.cam_width or P[1].min() <= 0 or P[0].min() <= 0:
             return image, False
 
         P = P.astype(int)
         if np.any((P[1] < 0) | (P[1] >= image.shape[0]) | (P[0] < 0) | (P[0] >= image.shape[1])):
             print(f"Error: P is out of bounds: P={P}, image.shape={image.shape}")
+            print("self.cam_height: ", self.cam_height)
+            print("self.cam_width: ", self.cam_width)
             print(f"R: {R}, t: {t}, self.point_cloud[obj_id]: {self.point_cloud[obj_id]}")
             print(f"self.cam_K_np: {self.cam_K_np}")
         else:
@@ -109,7 +111,7 @@ class Dataset():
         #     return image, False
 
         # P = P / P[-1, :]
-
+        
 
         ### TODO: Render just the points inside.
         if P[1].max() >= self.cam_height or P[0].max() >= self.cam_width:
